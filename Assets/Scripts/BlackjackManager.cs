@@ -17,13 +17,23 @@ public class BlackjackManager : MonoBehaviour
     public enum BlackjackState
     {
         Idle,
+        InitialDraw,
         Playing
     }
     public BlackjackState currentState;
 
+    public enum EndState
+    {
+        Win,
+        Draw,
+        Loss,
+        NaturalWin
+    }
+
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private Image[] imageList;
     [SerializeField] private int deckNumber;
+    [SerializeField] private int minimumBet;
     [Header("Events")]
     public UnityEvent BetMade = new UnityEvent();
     [Header("UI Elements")]
@@ -40,6 +50,7 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private List<Card> cards = new();
     [SerializeField] private List<Card> drawnCards = new();
     [SerializeField] private List<Card> dealerDrawnCards = new();
+    [SerializeField] private List<GameObject> displayCards = new();
 
     [SerializeField] private int money = 5000; // Refer this to the actual money value in the script holding it
     private int cardValue = 0;
@@ -47,12 +58,15 @@ public class BlackjackManager : MonoBehaviour
     private int cardAceValue = 0;
     private int dealerCardAceValue = 0;
     private int currentBet = 0;
+    private bool drawn;
 
     private void CreateDeck()
     {
+        foreach (GameObject card in displayCards) Destroy(card);
         cards.Clear();
         drawnCards.Clear();
         dealerDrawnCards.Clear();
+        displayCards.Clear();
         for (int deck = 0; deck < deckNumber; deck++)
         {
             for (int suit = 0; suit < 4; suit++)
@@ -68,6 +82,14 @@ public class BlackjackManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void CreateDisplayCard(Card card, bool playerSide)
+    {
+        GameObject physicalCard;
+        if (playerSide) physicalCard = Instantiate(cardPrefab, cardHolder.transform);
+        else physicalCard = Instantiate(cardPrefab, dealerCardHolder.transform);
+        displayCards.Add(physicalCard);
     }
 
     private void SetState(BlackjackState state)
@@ -89,7 +111,7 @@ public class BlackjackManager : MonoBehaviour
                 {
                     betInput.interactable = false;
                     drawButton.interactable = false;
-                    doubleButton.interactable = true;
+                    doubleButton.interactable = !drawn;
                     hitButton.interactable = true;
                     standButton.interactable = true;
                     break;
@@ -110,9 +132,9 @@ public class BlackjackManager : MonoBehaviour
             return;
         }
         int betAmount = Convert.ToInt32(betInput.text);
-        if (betAmount <= 0)
+        if (betAmount < minimumBet)
         {
-            Debug.Log("Cannot bet 0 or a negative amount");
+            Debug.Log("Must bet " + minimumBet.ToString() + " or more");
             return;
         }
         if (betAmount > money)
@@ -127,13 +149,21 @@ public class BlackjackManager : MonoBehaviour
     private void InitialDraw()
     {
         CreateDeck();
-        SetState(BlackjackState.Playing);
+        drawn = false;
+        SetState(BlackjackState.InitialDraw);
         currentBet = Convert.ToInt32(betInput.text);
         money -= currentBet;
         DrawPlayerCard();
         DrawPlayerCard();
         DrawDealerCard(false);
         DrawDealerCard(true);
+        SetState(BlackjackState.Playing);
+        if (dealerCardAceValue == 21)
+        {
+            if (cardAceValue == 21) EndGame(EndState.Draw);
+            else EndGame(EndState.Loss);
+        }
+        else if (cardAceValue == 21) EndGame(EndState.NaturalWin);
         Debug.Log("yippee");
     }
 
@@ -167,13 +197,19 @@ public class BlackjackManager : MonoBehaviour
         Card card = cards[UnityEngine.Random.Range(0, cards.Count)];
         drawnCards.Add(card);
         cards.Remove(card);
-        Instantiate(cardPrefab, cardHolder.transform);
+        CreateDisplayCard(card, true);
         UpdatePlayerScore();
     }
 
     private void DrawDealerCard(bool hidden)
     {
         //Check intoxication event
+        Card card = cards[UnityEngine.Random.Range(0, cards.Count)];
+        dealerDrawnCards.Add(card);
+        cards.Remove(card);
+        card.hidden = hidden;
+        CreateDisplayCard(card, false);
+        UpdateDealerScore();
     }
 
     private void CheckValidityOfHit()
@@ -188,6 +224,7 @@ public class BlackjackManager : MonoBehaviour
 
     private void Hit()
     {
+        drawn = true;
         DrawPlayerCard();
     }
 
@@ -204,6 +241,14 @@ public class BlackjackManager : MonoBehaviour
     private void Stand()
     {
         Debug.Log("stand");
+        RevealDealerCards();
+        while (dealerCardAceValue < 17) DrawDealerCard(false);
+        if (currentState != BlackjackState.Idle)
+        {
+            if (dealerCardAceValue < cardAceValue) EndGame(EndState.Win);
+            else if (dealerCardAceValue > cardAceValue) EndGame(EndState.Loss);
+            else EndGame(EndState.Draw);
+        }
     }
 
     private int CountAces(int initialValue, int aces)
@@ -215,7 +260,7 @@ public class BlackjackManager : MonoBehaviour
             currentAces--;
             value += 11;
         }
-        if (value > 21 && currentAces > 0)
+        if (value > 21)
         {
             value -= 10;
             while (currentAces > 0)
@@ -249,23 +294,103 @@ public class BlackjackManager : MonoBehaviour
                 }
             }
         }
-        value = CountAces(value, aces);
-        cardValue = value;
-        score.text = value.ToString();
-        if (value > 21)
+        cardValue = value + aces;
+        if (aces > 0) value = CountAces(value, aces);
+        cardAceValue = value;
+
+        score.text = cardValue.ToString();
+        if (cardAceValue != cardValue) score.text += " (" + cardAceValue.ToString() + ")";
+
+        if (currentState == BlackjackState.Playing)
         {
-            EndGame(false);
+            if (cardValue > 21) EndGame(EndState.Loss);
+            else if (cardAceValue == 21) EndGame(EndState.Win);
         }
+
     }
 
     private void UpdateDealerScore()
     {
+        int aces = 0;
+        int value = 0;
+        int hiddenCards = 0;
+        for (int i = 0; i < dealerDrawnCards.Count; i++)
+        {
+            if (dealerDrawnCards[i] != null)
+            {
+                if (dealerDrawnCards[i].hidden)
+                {
+                    hiddenCards++;
+                    continue;
+                }
+                else if (dealerDrawnCards[i].number >= 10)
+                {
+                    value += 10;
+                }
+                else if (dealerDrawnCards[i].number == 1)
+                {
+                    aces++;
+                }
+                else
+                {
+                    value += dealerDrawnCards[i].number;
+                }
+            }
+        }
+        dealerCardValue = value + aces;
+        if (aces > 0) value = CountAces(value, aces);
+        dealerCardAceValue = value;
 
+        dealerScore.text = cardValue.ToString();
+        if (dealerCardAceValue != dealerCardValue) dealerScore.text += " (" + dealerCardAceValue.ToString() + ")";
+        if (hiddenCards > 0) dealerScore.text += " + ?";
+
+        if (currentState == BlackjackState.Playing)
+        {
+            if (dealerCardValue > 21) EndGame(EndState.Win);
+            else if (dealerCardAceValue == 21) EndGame(EndState.Loss);
+        }
     }
 
-    private void EndGame(bool won)
+    private void RevealDealerCards()
     {
+        foreach (Card dealerCard in dealerDrawnCards)
+        {
+            dealerCard.hidden = false;
+        }
+        UpdateDealerScore();
+    }
 
+    private void EndGame(EndState state)
+    {
+        switch (state)
+        {
+            case EndState.Win:
+                {
+                    Debug.Log("WIN");
+                    money += currentBet * 2;
+                    break;
+                }
+            case EndState.Draw:
+                {
+                    Debug.Log("PUSH");
+                    money += currentBet;
+                    break;
+                }
+            case EndState.Loss:
+                {
+                    Debug.Log("LOSS");
+                    break;
+                }
+            case EndState.NaturalWin:
+                {
+                    Debug.Log("NATURAL WIN");
+                    money += (int)Mathf.Floor(currentBet * 1.5f);
+                    break;
+                }
+        }
+        currentBet = 0;
+        SetState(BlackjackState.Idle);
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
