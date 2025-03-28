@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -51,6 +52,7 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private Button hitButton;
     [SerializeField] private Button standButton;
     [SerializeField] private TMP_InputField betInput;
+    [SerializeField] private TextMeshProUGUI statusFieldText;
     [Space(50)]
     [SerializeField] private List<Card> cards = new();
     [SerializeField] private List<Card> drawnCards = new();
@@ -400,29 +402,52 @@ public class BlackjackManager : MonoBehaviour
                 {
                     Debug.Log("WIN");
                     phoneManager.BankValue += currentBet * 2;
+                    StartCoroutine(HandStatusAnimation(currentBet * 2, "Win!"));
                     break;
                 }
             case EndState.Draw:
                 {
                     Debug.Log("PUSH");
+                    StartCoroutine(HandStatusAnimation(currentBet, "Push!"));
                     phoneManager.BankValue += currentBet;
                     break;
                 }
             case EndState.Loss:
                 {
                     Debug.Log("LOSS");
+                    StartCoroutine(HandStatusAnimation(currentBet, "Loss!"));
                     break;
                 }
             case EndState.NaturalWin:
                 {
                     Debug.Log("NATURAL WIN");
                     phoneManager.BankValue += (int)Mathf.Floor(currentBet * 1.5f);
+                    StartCoroutine(HandStatusAnimation((int)Mathf.Floor(currentBet * 1.5f), "Blackjack!"));
                     break;
                 }
         }
         currentBet = 0;
         SetState(BlackjackState.Idle);
         EndOfHand.Invoke();
+    }
+
+    private IEnumerator HandStatusAnimation(int betValue, string winCondition)
+    {
+        statusFieldText.gameObject.SetActive(true);
+        RectTransform statusRect = statusFieldText.GetComponent<RectTransform>();
+        float elapsedMoveTime = 0f;
+        float moveDuration = 2f;
+        Vector2 startPosition = statusRect.position;
+
+        while (elapsedMoveTime < moveDuration)
+        {
+            statusRect.position = new Vector2(startPosition.x, startPosition.y - 25f * Time.deltaTime);
+            elapsedMoveTime += Time.deltaTime;
+            yield return null;
+        }
+
+
+        statusFieldText.gameObject.SetActive(false);
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -432,7 +457,7 @@ public class BlackjackManager : MonoBehaviour
         doubleButton.onClick.AddListener(CheckValidityOfDouble);
         hitButton.onClick.AddListener(CheckValidityOfHit);
         standButton.onClick.AddListener(CheckValidityOfStand);
-
+        statusFieldText.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
