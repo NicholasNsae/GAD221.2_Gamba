@@ -31,7 +31,12 @@ public class BlackjackManager : MonoBehaviour
     }
 
     [SerializeField] private GameObject cardPrefab;
-    [SerializeField] private Image[] imageList;
+    //[SerializeField] private Image[] imageList;
+    [SerializeField] private Sprite cardBack;
+    [SerializeField] private Sprite[] spadeCards = new Sprite[13];
+    [SerializeField] private Sprite[] clubCards = new Sprite[13];
+    [SerializeField] private Sprite[] heartCards = new Sprite[13];
+    [SerializeField] private Sprite[] diamondCards = new Sprite[13];
     [SerializeField] private int deckNumber;
     [SerializeField] private int minimumBet;
     [Header("Events")]
@@ -74,11 +79,29 @@ public class BlackjackManager : MonoBehaviour
             {
                 for (int num = 1; num < 14; num++)
                 {
+                    Sprite cardSprite = null;
+                    switch ((Suit) suit)
+                    {
+                        case Suit.Spades:
+                            cardSprite = spadeCards[num - 1];
+                            break;
+                        case Suit.Clubs:
+                            cardSprite = clubCards[num - 1];
+                            break;
+                        case Suit.Hearts:
+                            cardSprite = heartCards[num - 1];
+                            break;
+                        case Suit.Diamonds:
+                            cardSprite = diamondCards[num - 1];
+                            break;
+                    }
+
                     cards.Add(new Card
                     {
                         suit = (Suit)suit,
                         number = num,
-                        hidden = false
+                        hidden = false,
+                        sprite = cardSprite
                     });
                 }
             }
@@ -90,7 +113,16 @@ public class BlackjackManager : MonoBehaviour
         GameObject physicalCard;
         if (playerSide) physicalCard = Instantiate(cardPrefab, cardHolder.transform);
         else physicalCard = Instantiate(cardPrefab, dealerCardHolder.transform);
+        if (card.hidden)
+        {
+            physicalCard.GetComponent<Image>().sprite = cardBack;
+        }
+        else
+        {
+            physicalCard.GetComponent<Image>().sprite = card.sprite;
+        }
         displayCards.Add(physicalCard);
+        card.obj = physicalCard;
     }
 
     private void SetState(BlackjackState state)
@@ -355,6 +387,7 @@ public class BlackjackManager : MonoBehaviour
         foreach (Card dealerCard in dealerDrawnCards)
         {
             dealerCard.hidden = false;
+            dealerCard.obj.GetComponent<Image>().sprite = dealerCard.sprite;
         }
         UpdateDealerScore();
     }
