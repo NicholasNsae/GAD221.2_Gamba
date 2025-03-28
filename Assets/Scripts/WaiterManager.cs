@@ -22,7 +22,6 @@ public class WaiterManager : MonoBehaviour
     void Start()
     {
         waiterPanel.gameObject.SetActive(false);
-        WaiterNotifyEvent();
     }
 
     // Update is called once per frame
@@ -34,7 +33,7 @@ public class WaiterManager : MonoBehaviour
     // THIS FUNCTION WILL BE ADDED TO TIME EVENT
     public void WaiterNotifyEvent()
     {
-        int activateWaiter = 0;//Random.Range(0, 4);
+        int activateWaiter = Random.Range(0, 4);
 
         if (activateWaiter == 0)
         {
@@ -81,12 +80,13 @@ public class WaiterManager : MonoBehaviour
         {
             // invoke drinking event
             onWaiterAcceptDrinkEvent.Invoke();
+            phoneManager.BankValue -= valueOfDrink;
             waiterNotificationText.text = "Here you are, Have a good night!";
             waiterAcceptDrinkButton.onClick.RemoveAllListeners();
             waiterDeclineDrinkButton.onClick.RemoveAllListeners();
             waiterAcceptDrinkButton.gameObject.SetActive(false);
             waiterDeclineDrinkButton.gameObject.SetActive(false);
-            StartCoroutine(FadeOutOfWaiter(5f));
+            StartCoroutine(FadeOutOfWaiter(4f));
         }
         else
         {
@@ -95,7 +95,7 @@ public class WaiterManager : MonoBehaviour
             waiterDeclineDrinkButton.onClick.RemoveAllListeners();
             waiterAcceptDrinkButton.gameObject.SetActive(false);
             waiterDeclineDrinkButton.gameObject.SetActive(false);
-            StartCoroutine(FadeOutOfWaiter(5f));
+            StartCoroutine(FadeOutOfWaiter(4f));
         }
     }
 
@@ -106,7 +106,7 @@ public class WaiterManager : MonoBehaviour
         waiterDeclineDrinkButton.onClick.RemoveAllListeners();
         waiterAcceptDrinkButton.gameObject.SetActive(false);
         waiterDeclineDrinkButton.gameObject.SetActive(false);
-        StartCoroutine(FadeOutOfWaiter(5f));
+        StartCoroutine(FadeOutOfWaiter(4f));
     }
 
     private IEnumerator FadeOutOfWaiter(float duration)

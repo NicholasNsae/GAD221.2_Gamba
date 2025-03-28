@@ -35,7 +35,7 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private int deckNumber;
     [SerializeField] private int minimumBet;
     [Header("Events")]
-    public UnityEvent BetMade = new UnityEvent();
+    public UnityEvent EndOfHand = new UnityEvent();
     [Header("UI Elements")]
     [SerializeField] private GameObject cardHolder;
     [SerializeField] private GameObject dealerCardHolder;
@@ -52,7 +52,8 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private List<Card> dealerDrawnCards = new();
     [SerializeField] private List<GameObject> displayCards = new();
 
-    [SerializeField] private int money = 5000; // Refer this to the actual money value in the script holding it
+    [SerializeField] private PhoneManager phoneManager;
+
     private int cardValue = 0;
     private int dealerCardValue = 0;
     private int cardAceValue = 0;
@@ -137,7 +138,7 @@ public class BlackjackManager : MonoBehaviour
             Debug.Log("Must bet " + minimumBet.ToString() + " or more");
             return;
         }
-        if (betAmount > money)
+        if (betAmount > phoneManager.BankValue)
         {
             Debug.Log("Cannot bet more than you have");
             return;
@@ -152,7 +153,7 @@ public class BlackjackManager : MonoBehaviour
         drawn = false;
         SetState(BlackjackState.InitialDraw);
         currentBet = Convert.ToInt32(betInput.text);
-        money -= currentBet;
+        phoneManager.BankValue -= currentBet;
         DrawPlayerCard();
         DrawPlayerCard();
         DrawDealerCard(false);
@@ -174,7 +175,7 @@ public class BlackjackManager : MonoBehaviour
             Debug.Log("Can only double while playing");
             return;
         }
-        if (currentBet > money)
+        if (currentBet > phoneManager.BankValue)
         {
             Debug.Log("You do not have enough money to double");
             return;
@@ -184,7 +185,7 @@ public class BlackjackManager : MonoBehaviour
 
     private void Double()
     {
-        money -= currentBet;
+        phoneManager.BankValue -= currentBet;
         currentBet *= 2;
         betInput.text = currentBet.ToString();
         CheckValidityOfHit();
@@ -253,6 +254,7 @@ public class BlackjackManager : MonoBehaviour
 
     private int CountAces(int initialValue, int aces)
     {
+        if (initialValue + aces > 21) return initialValue + aces;
         int value = initialValue;
         int currentAces = aces;
         while (currentAces > 0 && value < 21)
@@ -263,11 +265,7 @@ public class BlackjackManager : MonoBehaviour
         if (value > 21)
         {
             value -= 10;
-            while (currentAces > 0)
-            {
-                currentAces--;
-                value++;
-            }
+            value += currentAces;
         }
         return value;
     }
@@ -304,7 +302,7 @@ public class BlackjackManager : MonoBehaviour
         if (currentState == BlackjackState.Playing)
         {
             if (cardValue > 21) EndGame(EndState.Loss);
-            else if (cardAceValue == 21) EndGame(EndState.Win);
+            else if (cardAceValue == 21) Stand();
         }
 
     }
@@ -341,14 +339,14 @@ public class BlackjackManager : MonoBehaviour
         if (aces > 0) value = CountAces(value, aces);
         dealerCardAceValue = value;
 
-        dealerScore.text = cardValue.ToString();
+        dealerScore.text = dealerCardValue.ToString();
         if (dealerCardAceValue != dealerCardValue) dealerScore.text += " (" + dealerCardAceValue.ToString() + ")";
         if (hiddenCards > 0) dealerScore.text += " + ?";
 
         if (currentState == BlackjackState.Playing)
         {
             if (dealerCardValue > 21) EndGame(EndState.Win);
-            else if (dealerCardAceValue == 21) EndGame(EndState.Loss);
+            else if (dealerCardAceValue == 21 && cardAceValue < 21) EndGame(EndState.Loss);
         }
     }
 
@@ -368,13 +366,13 @@ public class BlackjackManager : MonoBehaviour
             case EndState.Win:
                 {
                     Debug.Log("WIN");
-                    money += currentBet * 2;
+                    phoneManager.BankValue += currentBet * 2;
                     break;
                 }
             case EndState.Draw:
                 {
                     Debug.Log("PUSH");
-                    money += currentBet;
+                    phoneManager.BankValue += currentBet;
                     break;
                 }
             case EndState.Loss:
@@ -385,12 +383,13 @@ public class BlackjackManager : MonoBehaviour
             case EndState.NaturalWin:
                 {
                     Debug.Log("NATURAL WIN");
-                    money += (int)Mathf.Floor(currentBet * 1.5f);
+                    phoneManager.BankValue += (int)Mathf.Floor(currentBet * 1.5f);
                     break;
                 }
         }
         currentBet = 0;
         SetState(BlackjackState.Idle);
+        EndOfHand.Invoke();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -417,4 +416,5 @@ public class Card
     public int number;
     public bool hidden;
     public GameObject obj;
+    public Sprite sprite;
 }
