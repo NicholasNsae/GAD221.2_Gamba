@@ -37,11 +37,13 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private Sprite[] clubCards = new Sprite[13];
     [SerializeField] private Sprite[] heartCards = new Sprite[13];
     [SerializeField] private Sprite[] diamondCards = new Sprite[13];
+    [SerializeField] private Texture[] chipParticles;
     [SerializeField] private int deckNumber;
     [SerializeField] private int minimumBet;
     [Header("Events")]
     public UnityEvent EndOfHand = new UnityEvent();
     [Header("UI Elements")]
+    [SerializeField] private Canvas canvas;
     [SerializeField] private GameObject cardHolder;
     [SerializeField] private GameObject dealerCardHolder;
     [SerializeField] private TextMeshProUGUI score;
@@ -56,7 +58,9 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private List<Card> drawnCards = new();
     [SerializeField] private List<Card> dealerDrawnCards = new();
     [SerializeField] private List<GameObject> displayCards = new();
+    
 
+    [SerializeField] private ParticleManager particleManager;
     [SerializeField] private PhoneManager phoneManager;
 
     private int cardValue = 0;
@@ -399,6 +403,8 @@ public class BlackjackManager : MonoBehaviour
             case EndState.Win:
                 {
                     Debug.Log("WIN");
+                    foreach (Texture texture in chipParticles) StartCoroutine(particleManager.EmitParticles(30, 2, 5, texture, new Vector2(0, canvas.pixelRect.height + 100), new Vector2(canvas.pixelRect.width, canvas.pixelRect.height + 100), Vector2.zero, new Vector2(0, -1000), new Vector2(0, -300), new Vector2(0, -300),
+                        Vector3.zero, new Vector3(360, 360, 360), new Vector3(-360,-360,-360), new Vector3(360,360,360), Vector3.zero, Vector3.zero));
                     phoneManager.BankValue += currentBet * 2;
                     break;
                 }
@@ -416,6 +422,9 @@ public class BlackjackManager : MonoBehaviour
             case EndState.NaturalWin:
                 {
                     Debug.Log("NATURAL WIN");
+                    foreach (Texture texture in chipParticles) StartCoroutine(particleManager.EmitParticles(20, 2, 5, texture, new Vector2(0, canvas.pixelRect.height + 100), new Vector2(canvas.pixelRect.width, canvas.pixelRect.height + 100), Vector2.zero, new Vector2(0, -1000), new Vector2(0, -300), new Vector2(0, -300),
+                        Vector3.zero, new Vector3(360, 360, 360), new Vector3(-360, -360, -360), new Vector3(360, 360, 360), Vector3.zero, Vector3.zero));
+                    phoneManager.BankValue += currentBet * 2;
                     phoneManager.BankValue += (int)Mathf.Floor(currentBet * 1.5f);
                     break;
                 }
