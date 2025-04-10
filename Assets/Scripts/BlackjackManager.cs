@@ -40,8 +40,10 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private Sprite[] diamondCards = new Sprite[13];
     [SerializeField] private int deckNumber;
     [SerializeField] private int minimumBet;
+    
     [Header("Events")]
-    public UnityEvent EndOfHand = new UnityEvent();
+    [SerializeField] private UnityEvent EndOfHandEvent;
+    
     [Header("UI Elements")]
     [SerializeField] private GameObject cardHolder;
     [SerializeField] private GameObject dealerCardHolder;
@@ -402,42 +404,44 @@ public class BlackjackManager : MonoBehaviour
                 {
                     Debug.Log("WIN");
                     phoneManager.BankValue += currentBet * 2;
-                    StartCoroutine(HandStatusAnimation(currentBet * 2, "Win!"));
+                    StartCoroutine(HandStatusAnimation(currentBet * 2, "Won + $"));
                     break;
                 }
             case EndState.Draw:
                 {
                     Debug.Log("PUSH");
-                    StartCoroutine(HandStatusAnimation(currentBet, "Push!"));
+                    StartCoroutine(HandStatusAnimation(currentBet, "Push $"));
                     phoneManager.BankValue += currentBet;
                     break;
                 }
             case EndState.Loss:
                 {
                     Debug.Log("LOSS");
-                    StartCoroutine(HandStatusAnimation(currentBet, "Loss!"));
+                    StartCoroutine(HandStatusAnimation(currentBet, "Lost - $"));
                     break;
                 }
             case EndState.NaturalWin:
                 {
                     Debug.Log("NATURAL WIN");
                     phoneManager.BankValue += (int)Mathf.Floor(currentBet * 1.5f);
-                    StartCoroutine(HandStatusAnimation((int)Mathf.Floor(currentBet * 1.5f), "Blackjack!"));
+                    StartCoroutine(HandStatusAnimation((int)Mathf.Floor(currentBet * 1.5f), "Blackjack won + $"));
                     break;
                 }
         }
         currentBet = 0;
         SetState(BlackjackState.Idle);
-        EndOfHand.Invoke();
+        EndOfHandEvent.Invoke();
     }
 
     private IEnumerator HandStatusAnimation(int betValue, string winCondition)
     {
+        Debug.Log("Coroutine Started");
         statusFieldText.gameObject.SetActive(true);
         RectTransform statusRect = statusFieldText.GetComponent<RectTransform>();
         float elapsedMoveTime = 0f;
         float moveDuration = 2f;
         Vector2 startPosition = statusRect.position;
+        statusFieldText.text = winCondition + betValue + "!";
 
         while (elapsedMoveTime < moveDuration)
         {
@@ -445,7 +449,6 @@ public class BlackjackManager : MonoBehaviour
             elapsedMoveTime += Time.deltaTime;
             yield return null;
         }
-
 
         statusFieldText.gameObject.SetActive(false);
     }
