@@ -14,8 +14,8 @@ public class PhoneManager : MonoBehaviour
         get => bankValue;
         set
         {
-            BankValueChanged?.Invoke(value, bankValue);
-            UpdateBankText();
+            BankValueChanged?.Invoke(bankValue, value);
+            // UpdateBankText();
             bankValue = value;
         }
     }
@@ -26,15 +26,15 @@ public class PhoneManager : MonoBehaviour
         BankValue = 1000;
     }
 
-    // I added this so it doesn't update every frame (but it won't update if the bank value is changed in the inspector) - DE
-    private void UpdateBankText()
-    {
-        bankValueText.text = "Account Amount: $" + BankValue.ToString();
-    }
-    
-    // // Update is called once per frame
-    // void Update()
+    // // I added this so it doesn't update every frame (but it won't update if the bank value is changed in the inspector) - DE
+    // private void UpdateBankText()
     // {
     //     bankValueText.text = "Account Amount: $" + BankValue.ToString();
     // }
+    
+    // Update is called once per frame
+    void Update()
+    {
+        bankValueText.text = "Account Amount: $" + BankValue.ToString();
+    }
 }
