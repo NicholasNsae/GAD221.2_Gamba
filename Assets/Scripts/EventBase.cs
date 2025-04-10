@@ -27,8 +27,7 @@ public abstract class EventBase : MonoBehaviour
         FadeToBlackWithText
     }
 
-    public bool AddedToQueue { get; set; }
-    protected bool addedToQueue;
+    public bool InQueue;
     
     protected FadeToBlack fadeToBlack;
     

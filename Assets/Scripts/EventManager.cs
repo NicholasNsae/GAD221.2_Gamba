@@ -149,7 +149,7 @@ public class EventManager : MonoBehaviour
             EventDetails eventDetails = gameEvent.EventInfo;
             
             // Don't add this event to queue because it's already in there.
-            if (gameEvent.AddedToQueue) continue;
+            if (gameEvent.InQueue) continue;
 
             bool eventAddedToQueue = true;
 
@@ -198,7 +198,7 @@ public class EventManager : MonoBehaviour
                 }
             }
             
-            gameEvent.AddedToQueue = eventAddedToQueue;
+            gameEvent.InQueue = eventAddedToQueue;
             StartCoroutine(TriggerEvents(instantEventsSimultaneous, false));
             StartCoroutine(TriggerEventsAfterCurrent(instantEventsQueued));
         }
@@ -235,13 +235,15 @@ public class EventManager : MonoBehaviour
             {
                 eventList.Remove(nextEvent);
             }
-            eventsToTrigger.Dequeue();
+            
+            // Remove event from queue and set "InQueue" to false
+            eventsToTrigger.Dequeue().InQueue = false;
         }
     }
     
     private void OnNewNightStarted(EventBase nightEvent)
     {
-        Debug.Log("Night Started");
+        Debug.Log($"Night {OverallStats.NightsSpentGambling} Started");
         NightStats.ResetStats();
         NightStats.TimerRunning = true;
         OverallStats.TimerRunning = true;
@@ -253,7 +255,7 @@ public class EventManager : MonoBehaviour
     
     private void OnNightEnded(EventBase nightEvent)
     {
-        Debug.Log("Night Ended");
+        Debug.Log($"Night {OverallStats.NightsSpentGambling} Ended");
         NightStats.TimerRunning = false;
         OverallStats.TimerRunning = false;
         OverallStats.NightsSpentGambling++;

@@ -10,7 +10,7 @@ public class NightEnded_Event : EventBase
         if (nightStats.HandsPlayed >= 3)
         {
             conditionsMet = true;
-            EventInfo.EventTitleText = $"End of Night {nightStats.NightsSpentGambling + 1}";
+            EventInfo.EventTitleText = $"End of Night {overallStats.NightsSpentGambling}";
         }
         
         return conditionsMet;
