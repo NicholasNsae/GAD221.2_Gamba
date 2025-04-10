@@ -53,11 +53,18 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private Button hitButton;
     [SerializeField] private Button standButton;
     [SerializeField] private TMP_InputField betInput;
+    [SerializeField] private TextMeshProUGUI feedbackText;
+    [SerializeField] private TextMeshProUGUI dealerFeedbackText;
     [Space(50)]
     [SerializeField] private List<Card> cards = new();
     [SerializeField] private List<Card> drawnCards = new();
     [SerializeField] private List<Card> dealerDrawnCards = new();
     [SerializeField] private List<GameObject> displayCards = new();
+    [SerializeField] private Color standardTextColour = Color.white;
+    [SerializeField] private Color winTextColour = Color.green;
+    [SerializeField] private Color loseTextColour = Color.red;
+    [SerializeField] private Color drawTextColour = new Color(1f, 0.5f, 0f);
+    [SerializeField] private Color naturalWinTextColour = Color.yellow;
     
 
     [SerializeField] private ParticleManager particleManager;
@@ -151,6 +158,10 @@ public class BlackjackManager : MonoBehaviour
                     doubleButton.interactable = !drawn;
                     hitButton.interactable = true;
                     standButton.interactable = true;
+                    score.color = standardTextColour;
+                    dealerScore.color = standardTextColour;
+                    feedbackText.gameObject.SetActive(false);
+                    dealerFeedbackText.gameObject.SetActive(false);
                     break;
                 }
         }
@@ -406,17 +417,60 @@ public class BlackjackManager : MonoBehaviour
                     foreach (Texture texture in chipParticles) StartCoroutine(particleManager.EmitParticles(30, 2, 5, texture, new Vector2(0, canvas.pixelRect.height + 100), new Vector2(canvas.pixelRect.width, canvas.pixelRect.height + 100), Vector2.zero, new Vector2(0, -1000), new Vector2(0, -300), new Vector2(0, -300),
                         Vector3.zero, new Vector3(360, 360, 360), new Vector3(-360,-360,-360), new Vector3(360,360,360), Vector3.zero, Vector3.zero));
                     phoneManager.BankValue += currentBet * 2;
+                    score.color = winTextColour;
+                    dealerScore.color = loseTextColour;
+                    if (cardAceValue == 21)
+                    {
+                        feedbackText.text = "BLACKJACK";
+                        feedbackText.color = naturalWinTextColour;
+                        
+                    }
+                    else
+                    {
+                        feedbackText.text = "WIN";
+                        feedbackText.color = winTextColour;
+                    }
+                    feedbackText.gameObject.SetActive(true);
+                    if (dealerCardAceValue > 21)
+                    {
+                        dealerFeedbackText.text = "BUST";
+                        dealerFeedbackText.color = loseTextColour;
+                        dealerFeedbackText.gameObject.SetActive(true);
+                    }
                     break;
                 }
             case EndState.Draw:
                 {
                     Debug.Log("PUSH");
                     phoneManager.BankValue += currentBet;
+                    score.color = drawTextColour;
+                    dealerScore.color = drawTextColour;
+                    feedbackText.text = "PUSH";
+                    feedbackText.color = drawTextColour;
+                    feedbackText.gameObject.SetActive(true);
                     break;
                 }
             case EndState.Loss:
                 {
                     Debug.Log("LOSS");
+                    score.color = loseTextColour;
+                    dealerScore.color = winTextColour;
+                    if (cardAceValue > 21)
+                    {
+                        feedbackText.text = "BUST";
+                    }
+                    else
+                    {
+                        feedbackText.text = "LOSS";
+                    }
+                    feedbackText.color = loseTextColour;
+                    feedbackText.gameObject.SetActive(true);
+                    if (dealerCardAceValue == 21)
+                    {
+                        dealerFeedbackText.text = "BLACKJACK";
+                        dealerFeedbackText.color = naturalWinTextColour;
+                        dealerFeedbackText.gameObject.SetActive(true);
+                    }
                     break;
                 }
             case EndState.NaturalWin:
@@ -426,6 +480,11 @@ public class BlackjackManager : MonoBehaviour
                         Vector3.zero, new Vector3(360, 360, 360), new Vector3(-360, -360, -360), new Vector3(360, 360, 360), Vector3.zero, Vector3.zero));
                     phoneManager.BankValue += currentBet * 2;
                     phoneManager.BankValue += (int)Mathf.Floor(currentBet * 1.5f);
+                    score.color = naturalWinTextColour;
+                    dealerScore.color = loseTextColour;
+                    feedbackText.text = "NAT WIN";
+                    feedbackText.color = naturalWinTextColour;
+                    feedbackText.gameObject.SetActive(true);
                     break;
                 }
         }
