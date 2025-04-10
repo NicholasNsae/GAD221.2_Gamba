@@ -41,6 +41,9 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private int minimumBet;
     [Header("Events")]
     public UnityEvent EndOfHand = new UnityEvent();
+    public event Action<EndState, int> HandEnded; // int = how much money was won/lost
+    public event Action<int> HandStarted; // int = how much the player bet
+    public event Action<int> DoubledDown; // int = player's total bet after doubling down
     [Header("UI Elements")]
     [SerializeField] private GameObject cardHolder;
     [SerializeField] private GameObject dealerCardHolder;
@@ -186,6 +189,7 @@ public class BlackjackManager : MonoBehaviour
         SetState(BlackjackState.InitialDraw);
         currentBet = Convert.ToInt32(betInput.text);
         phoneManager.BankValue -= currentBet;
+        HandStarted?.Invoke(currentBet);
         DrawPlayerCard();
         DrawPlayerCard();
         DrawDealerCard(false);
@@ -219,6 +223,7 @@ public class BlackjackManager : MonoBehaviour
     {
         phoneManager.BankValue -= currentBet;
         currentBet *= 2;
+        DoubledDown?.Invoke(currentBet);
         betInput.text = currentBet.ToString();
         CheckValidityOfHit();
         CheckValidityOfStand();
@@ -400,23 +405,27 @@ public class BlackjackManager : MonoBehaviour
                 {
                     Debug.Log("WIN");
                     phoneManager.BankValue += currentBet * 2;
+                    HandEnded?.Invoke(state, currentBet * 2);
                     break;
                 }
             case EndState.Draw:
                 {
                     Debug.Log("PUSH");
                     phoneManager.BankValue += currentBet;
+                    HandEnded?.Invoke(state, currentBet);
                     break;
                 }
             case EndState.Loss:
                 {
                     Debug.Log("LOSS");
+                    HandEnded?.Invoke(state, -currentBet);
                     break;
                 }
             case EndState.NaturalWin:
                 {
                     Debug.Log("NATURAL WIN");
                     phoneManager.BankValue += (int)Mathf.Floor(currentBet * 1.5f);
+                    HandEnded?.Invoke(state, (int)Mathf.Floor(currentBet * 1.5f));
                     break;
                 }
         }

@@ -1,9 +1,10 @@
+using System;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using System.Collections;
+using Random = UnityEngine.Random;
 
 public class WaiterManager : MonoBehaviour
 {
@@ -17,17 +18,13 @@ public class WaiterManager : MonoBehaviour
 
     [Tooltip("UnityEvents")]
     [SerializeField] public UnityEvent onWaiterAcceptDrinkEvent;
+    public event Action<int> DrinkBought; // int is how much the drink was.
+    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         waiterPanel.gameObject.SetActive(false);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     // THIS FUNCTION WILL BE ADDED TO TIME EVENT
@@ -80,6 +77,7 @@ public class WaiterManager : MonoBehaviour
         {
             // invoke drinking event
             onWaiterAcceptDrinkEvent.Invoke();
+            DrinkBought?.Invoke(valueOfDrink);
             phoneManager.BankValue -= valueOfDrink;
             waiterNotificationText.text = "Here you are, Have a good night!";
             waiterAcceptDrinkButton.onClick.RemoveAllListeners();
