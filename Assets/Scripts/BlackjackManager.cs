@@ -40,6 +40,7 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private Texture[] chipParticles;
     [SerializeField] private int deckNumber;
     [SerializeField] private int minimumBet;
+    public int MinimumBet => minimumBet;
     [Header("Events")]
     public UnityEvent EndOfHand = new UnityEvent();
     public event Action<EndState, int> HandEnded; // int = how much money was won/lost
@@ -181,6 +182,7 @@ public class BlackjackManager : MonoBehaviour
         foreach (GameObject card in displayCards) Destroy(card);
         score.text = "0";
         dealerScore.text = "0";
+        phoneManager.BankValue = phoneManager.StartingBankValue;
     }
 
     private void CheckValidityOfDraw()

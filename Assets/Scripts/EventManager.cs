@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[System.Serializable]
 public class EventStats
 {
     public int NightsSpentGambling;
@@ -83,6 +84,9 @@ public class EventManager : MonoBehaviour
         waiterManager = waiterManager ?? FindFirstObjectByType<WaiterManager>();
         eventList = GetEventList();
         nightEndedEvent = eventList.OfType<NightEnded_Event>().FirstOrDefault();
+
+        NightStats.TimerRunning = true;
+        OverallStats.TimerRunning = true;
     }
 
     private void Update()

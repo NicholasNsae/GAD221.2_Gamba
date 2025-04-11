@@ -2617,10 +2617,12 @@ MonoBehaviour:
   ImageToFade: {fileID: 1486094271}
   TitleTextToFade: {fileID: 23411154}
   BodyTextToFade: {fileID: 1030027013}
+  timeBeforeFadeStarts: 3
   imageFadeInAndOutDuration: 0.5
   textFadeInAndOutDuration: 0.5
   noTextStayFadedDuration: 0
   textVisibleForDuration: 2
+  blackjackManager: {fileID: 0}
 --- !u!114 &1111108730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3830,12 +3832,28 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 570676381}
     - target: {fileID: 4916911342818435938, guid: de4aad8cc3468b940a13019374b92a33, type: 3}
+      propertyPath: EventInfo.timeBeforeFadeStarts
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4916911342818435938, guid: de4aad8cc3468b940a13019374b92a33, type: 3}
+      propertyPath: EventInfo.textVisibleForDuration
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4916911342818435938, guid: de4aad8cc3468b940a13019374b92a33, type: 3}
       propertyPath: EventInfo.EventBodyText.Array.size
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4916911342818435938, guid: de4aad8cc3468b940a13019374b92a33, type: 3}
+      propertyPath: EventInfo.textFadeInAndOutDuration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4916911342818435938, guid: de4aad8cc3468b940a13019374b92a33, type: 3}
+      propertyPath: EventInfo.imageFadeInAndOutDuration
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4916911342818435938, guid: de4aad8cc3468b940a13019374b92a33, type: 3}
       propertyPath: 'EventInfo.EventBodyText.Array.data[0]'
-      value: Banana
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4916911342818435938, guid: de4aad8cc3468b940a13019374b92a33, type: 3}
       propertyPath: 'EventInfo.EventBodyText.Array.data[1]'
@@ -4473,6 +4491,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bankValueText: {fileID: 907293986}
   bankValue: 0
+  startingBankValue: 1000
 --- !u!4 &2034813374
 Transform:
   m_ObjectHideFlags: 0

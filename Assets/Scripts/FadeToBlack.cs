@@ -10,16 +10,24 @@ public class FadeToBlack : MonoBehaviour
     [SerializeField] private Image ImageToFade;
     [SerializeField] private TextMeshProUGUI TitleTextToFade;
     [SerializeField] private TextMeshProUGUI BodyTextToFade;
-    
+
+    [SerializeField] private float timeBeforeFadeStarts = 3f;
     [SerializeField] private float imageFadeInAndOutDuration = 0.5f;
     [SerializeField] private float textFadeInAndOutDuration = 0.5f;
     [SerializeField] private float noTextStayFadedDuration = 0f;
     [SerializeField] private float textVisibleForDuration = 3f;
 
     private float timer;
-    private bool currentlyFading;
+    private bool currentlyFading = false;
     public bool CurrentlyFading => currentlyFading;
-    
+
+    [SerializeField] private BlackjackManager blackjackManager;
+
+    private void Awake()
+    {
+        blackjackManager = blackjackManager ?? FindFirstObjectByType<BlackjackManager>();
+    }
+
     //TODO - Turn off controls!
     public IEnumerator FadeToBlackCoroutine(EventDetails eventDetails)
     {
@@ -27,11 +35,21 @@ public class FadeToBlack : MonoBehaviour
         timer = 0f;
         BodyTextToFade.text = "";
         TitleTextToFade.text = "";
-        
+
+        timeBeforeFadeStarts = eventDetails.timeBeforeFadeStarts;
+        imageFadeInAndOutDuration = eventDetails.imageFadeInAndOutDuration;
+        textFadeInAndOutDuration = eventDetails.textFadeInAndOutDuration;
+        noTextStayFadedDuration = eventDetails.noTextStayFadedDuration;
+        textVisibleForDuration = eventDetails.textVisibleForDuration;
+
         currentlyFading = true;
+
+        yield return StartCoroutine(WaitForTime(timeBeforeFadeStarts));
         
         yield return StartCoroutine(FadeImage(1f, imageFadeInAndOutDuration));
         
+        blackjackManager.ResetState();
+
         string[] bodyText = eventDetails.EventBodyText;
         string titleText = eventDetails.EventTitleText;
         

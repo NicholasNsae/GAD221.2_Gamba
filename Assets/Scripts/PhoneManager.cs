@@ -6,6 +6,8 @@ public class PhoneManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI bankValueText;
     [SerializeField] private int bankValue;
+    [SerializeField] private int startingBankValue = 1000;
+    public int StartingBankValue => startingBankValue;
     
     public event Action<int, int> BankValueChanged; // First int is old value, second int is new value
 
@@ -23,7 +25,7 @@ public class PhoneManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        BankValue = 1000;
+        BankValue = startingBankValue;
     }
 
     // // I added this so it doesn't update every frame (but it won't update if the bank value is changed in the inspector) - DE

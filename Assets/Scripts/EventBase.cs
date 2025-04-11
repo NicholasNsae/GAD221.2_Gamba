@@ -4,12 +4,19 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 [System.Serializable]
-public struct EventDetails
+public class EventDetails
 {
     [Header("Event Data (only fill in what is required)")]
     public string EventTitleText;
-    [FormerlySerializedAs("EventText")] public string[] EventBodyText;
-    
+    public string[] EventBodyText;
+
+    [Header("FadeToBlackSettings")]
+    public float timeBeforeFadeStarts;
+    public float imageFadeInAndOutDuration;
+    public float textFadeInAndOutDuration;
+    public float noTextStayFadedDuration;
+    public float textVisibleForDuration;
+
     [Header("Event Settings")]
     public EventBase.EventType EventType;
     public EventManager.TriggerTiming TriggerTiming;
@@ -29,7 +36,7 @@ public abstract class EventBase : MonoBehaviour
 
     public bool InQueue;
     
-    protected FadeToBlack fadeToBlack;
+    [SerializeField] protected FadeToBlack fadeToBlack;
     
     [Header("Event Settings")]
     public EventDetails EventInfo;
@@ -37,7 +44,7 @@ public abstract class EventBase : MonoBehaviour
     public event Action<EventBase> EventStarted;
     public event Action<EventBase> EventFinished;
 
-    private void Awake()
+    private void Start()
     {
         fadeToBlack = FindFirstObjectByType<FadeToBlack>(FindObjectsInactive.Include);
     }
