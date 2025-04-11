@@ -170,6 +170,19 @@ public class BlackjackManager : MonoBehaviour
         }
     }
 
+    public void ResetState()
+    {
+        currentState = BlackjackState.Idle;
+        score.color = standardTextColour;
+        dealerScore.color = standardTextColour;
+        feedbackText.gameObject.SetActive(false);
+        dealerFeedbackText.gameObject.SetActive(false);
+        betInput.text = string.Empty;
+        foreach (GameObject card in displayCards) Destroy(card);
+        score.text = "0";
+        dealerScore.text = "0";
+    }
+
     private void CheckValidityOfDraw()
     {
         if (currentState != BlackjackState.Idle)
@@ -509,7 +522,7 @@ public class BlackjackManager : MonoBehaviour
         doubleButton.onClick.AddListener(CheckValidityOfDouble);
         hitButton.onClick.AddListener(CheckValidityOfHit);
         standButton.onClick.AddListener(CheckValidityOfStand);
-
+        ResetState();
     }
 
     // Update is called once per frame
