@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -59,6 +60,7 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] private TMP_InputField betInput;
     [SerializeField] private TextMeshProUGUI feedbackText;
     [SerializeField] private TextMeshProUGUI dealerFeedbackText;
+    [SerializeField] private TextMeshProUGUI statusFieldText;
     [Space(50)]
     [SerializeField] private List<Card> cards = new();
     [SerializeField] private List<Card> drawnCards = new();
@@ -458,11 +460,13 @@ public class BlackjackManager : MonoBehaviour
                         dealerFeedbackText.gameObject.SetActive(true);
                     }
                     HandEnded?.Invoke(state, currentBet * 2);
+                    StartCoroutine(HandStatusAnimation(currentBet * 2, "Won + $"));
                     break;
                 }
             case EndState.Draw:
                 {
                     Debug.Log("PUSH");
+                    StartCoroutine(HandStatusAnimation(currentBet, "Push $"));
                     phoneManager.BankValue += currentBet;
                     score.color = drawTextColour;
                     dealerScore.color = drawTextColour;
@@ -475,6 +479,7 @@ public class BlackjackManager : MonoBehaviour
             case EndState.Loss:
                 {
                     Debug.Log("LOSS");
+                    StartCoroutine(HandStatusAnimation(currentBet, "Lost - $"));
                     score.color = loseTextColour;
                     dealerScore.color = winTextColour;
                     if (cardAceValue > 21)
@@ -503,6 +508,7 @@ public class BlackjackManager : MonoBehaviour
                         Vector3.zero, new Vector3(360, 360, 360), new Vector3(-360, -360, -360), new Vector3(360, 360, 360), Vector3.zero, Vector3.zero));
                     phoneManager.BankValue += currentBet * 2;
                     phoneManager.BankValue += (int)Mathf.Floor(currentBet * 1.5f);
+                    StartCoroutine(HandStatusAnimation((int)Mathf.Floor(currentBet * 1.5f), "Blackjack won + $"));
                     score.color = naturalWinTextColour;
                     dealerScore.color = loseTextColour;
                     feedbackText.text = "NAT WIN";
@@ -517,6 +523,26 @@ public class BlackjackManager : MonoBehaviour
         EndOfHand.Invoke();
     }
 
+    private IEnumerator HandStatusAnimation(int betValue, string winCondition)
+    {
+        Debug.Log("Coroutine Started");
+        statusFieldText.gameObject.SetActive(true);
+        RectTransform statusRect = statusFieldText.GetComponent<RectTransform>();
+        float elapsedMoveTime = 0f;
+        float moveDuration = 2f;
+        Vector2 startPosition = statusRect.position;
+        statusFieldText.text = winCondition + betValue + "!";
+
+        while (elapsedMoveTime < moveDuration)
+        {
+            statusRect.position = new Vector2(startPosition.x, startPosition.y - 25f * Time.deltaTime);
+            elapsedMoveTime += Time.deltaTime;
+            yield return null;
+        }
+
+        statusFieldText.gameObject.SetActive(false);
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -525,12 +551,7 @@ public class BlackjackManager : MonoBehaviour
         hitButton.onClick.AddListener(CheckValidityOfHit);
         standButton.onClick.AddListener(CheckValidityOfStand);
         ResetState();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        statusFieldText.gameObject.SetActive(false);
     }
 }
 
