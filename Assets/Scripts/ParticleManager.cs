@@ -14,8 +14,8 @@ public class ParticleManager : MonoBehaviour
 
     private GameObject GetNextParticle()
     {
-        Debug.Log(currentIndex);
-        Debug.Log(particlePool.Count);
+        // Debug.Log(currentIndex);
+        // Debug.Log(particlePool.Count);
         GameObject particle = particlePool[currentIndex];
         if (particle.activeSelf && poolCanExpand)
         {
