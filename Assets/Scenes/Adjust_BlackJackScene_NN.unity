@@ -1266,11 +1266,13 @@ MonoBehaviour:
   - {fileID: -29992631, guid: 4fc6c8e67562cf946b532904ccc72828, type: 3}
   - {fileID: -1663528475, guid: 4fc6c8e67562cf946b532904ccc72828, type: 3}
   - {fileID: -848030267, guid: 4fc6c8e67562cf946b532904ccc72828, type: 3}
+  chipParticles: []
   deckNumber: 1
   minimumBet: 10
-  EndOfHandEvent:
+  EndOfHand:
     m_PersistentCalls:
       m_Calls: []
+  canvas: {fileID: 0}
   cardHolder: {fileID: 1434788313}
   dealerCardHolder: {fileID: 1082036334}
   score: {fileID: 250646499}
@@ -1280,11 +1282,19 @@ MonoBehaviour:
   hitButton: {fileID: 1362113865}
   standButton: {fileID: 78405264}
   betInput: {fileID: 2027678948}
-  statusFieldText: {fileID: 1340880706}
+  feedbackText: {fileID: 0}
+  dealerFeedbackText: {fileID: 0}
+  statusFieldText: {fileID: 0}
   cards: []
   drawnCards: []
   dealerDrawnCards: []
   displayCards: []
+  standardTextColour: {r: 1, g: 1, b: 1, a: 1}
+  winTextColour: {r: 0, g: 1, b: 0, a: 1}
+  loseTextColour: {r: 1, g: 0, b: 0, a: 1}
+  drawTextColour: {r: 1, g: 0.5, b: 0, a: 1}
+  naturalWinTextColour: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  particleManager: {fileID: 0}
   phoneManager: {fileID: 2034813373}
 --- !u!4 &570676382
 Transform:
@@ -4410,6 +4420,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bankValueText: {fileID: 907293986}
   bankValue: 0
+  startingBankValue: 1000
 --- !u!4 &2034813374
 Transform:
   m_ObjectHideFlags: 0
