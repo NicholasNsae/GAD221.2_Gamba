@@ -247,7 +247,7 @@ public class EventManager : MonoBehaviour
     
     private void OnNewNightStarted(EventBase nightEvent)
     {
-        Debug.Log($"Night {OverallStats.NightsSpentGambling} Started");
+        Debug.Log($"Night {OverallStats.NightsSpentGambling + 1} Started");
         NightStats.ResetStats();
         NightStats.TimerRunning = true;
         OverallStats.TimerRunning = true;
@@ -259,7 +259,7 @@ public class EventManager : MonoBehaviour
     
     private void OnNightEnded(EventBase nightEvent)
     {
-        Debug.Log($"Night {OverallStats.NightsSpentGambling} Ended");
+        Debug.Log($"Night {OverallStats.NightsSpentGambling + 1} Ended");
         NightStats.TimerRunning = false;
         OverallStats.TimerRunning = false;
         OverallStats.NightsSpentGambling++;
