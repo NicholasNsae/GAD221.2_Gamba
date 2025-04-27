@@ -2050,12 +2050,12 @@ RectTransform:
   - {fileID: 78405263}
   - {fileID: 2027678947}
   - {fileID: 217463133}
+  - {fileID: 1887267468}
+  - {fileID: 1979851259}
   - {fileID: 2108483260}
   - {fileID: 384933007}
   - {fileID: 225242996}
   - {fileID: 1111108728}
-  - {fileID: 1887267468}
-  - {fileID: 1979851259}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
