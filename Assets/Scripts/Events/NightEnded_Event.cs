@@ -12,20 +12,45 @@ public class NightEnded_Event : EventBase
 
     public override bool ConditionsMet(EventStats nightStats, EventStats overallStats)
     {
-        bool playedTooManyHands = nightStats.HandsPlayed >= 10 + Mathf.Floor(nightStats.HandsWon / 2f);
+        bool playedTooManyHands = nightStats.HandsPlayed >= 15 + Mathf.Floor(nightStats.HandsWon / 2f);
         bool notEnoughMoneyForMinimumBet = nightStats.BankBalance < blackjackManager.MinimumBet;
         bool hadTooMuchToDrink = nightStats.DrinksHad >= 5;
 
         if (playedTooManyHands || notEnoughMoneyForMinimumBet || hadTooMuchToDrink)
         {
-            // if (overallStats.NightsSpentGambling == 3)
-            // {
-            //     EventInfo.EventTitleText = $"End of Night {overallStats.NightsSpentGambling}";
-            // }
-            // else
-            // {
-                EventInfo.EventTitleText = $"End of Night {overallStats.NightsSpentGambling}";
+            // Shows up on the third night, then goes back to "end of night" so people can keep playing
+            if (overallStats.NightsSpentGambling == 3)
+            {
+                EventInfo.EventTitleText = $"Game Over";
 
+                int minutesPlayed = (int) Mathf.Floor(overallStats.TimeElapsed / 60f);
+                int secondsPlayed = (int) Mathf.Floor(overallStats.TimeElapsed % 60f);
+                string formattedTime = string.Format("{0:00}:{1:00}", minutesPlayed, secondsPlayed);
+
+                EventInfo.textVisibleForDuration = 5f;
+                
+                string statsA = $"Time Played: {formattedTime}\n" +
+                               $"Total Hands: {overallStats.HandsPlayed}\n" +
+                               $"Drinks Had: {overallStats.DrinksHad}";
+
+
+                string statsB = $"Biggest Streak: {overallStats.BiggestWinningStreak}\n" +
+                                $"Total Winnings: ${overallStats.Winnings}";
+                
+                string keepPlaying = $"You are more than welcome to keep playing!";
+                
+                EventInfo.EventBodyText = new string[3];
+                
+                EventInfo.EventBodyText[0] = statsA;
+                EventInfo.EventBodyText[1] = statsB;
+                EventInfo.EventBodyText[2] = keepPlaying;
+            }
+            
+            else
+            {
+                EventInfo.EventTitleText = $"End of Night {overallStats.NightsSpentGambling}";
+                EventInfo.textVisibleForDuration = 3f;
+                
                 if (playedTooManyHands)
                 {
                     EventInfo.EventBodyText = new string[2];
@@ -43,7 +68,7 @@ public class NightEnded_Event : EventBase
                     EventInfo.EventBodyText = new string[1];
                     EventInfo.EventBodyText[0] = "You've passed out...";
                 }
-            // }
+            }
             
             return true;
         }
