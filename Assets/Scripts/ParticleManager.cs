@@ -14,8 +14,8 @@ public class ParticleManager : MonoBehaviour
 
     private GameObject GetNextParticle()
     {
-        Debug.Log(currentIndex);
-        Debug.Log(particlePool.Count);
+        // Debug.Log(currentIndex);
+        // Debug.Log(particlePool.Count);
         GameObject particle = particlePool[currentIndex];
         if (particle.activeSelf && poolCanExpand)
         {
@@ -40,7 +40,7 @@ public class ParticleManager : MonoBehaviour
         Particle script = particle.GetComponent<Particle>();
         particle.SetActive(true);
         script.lifetime = lifetime;
-        Debug.Log(particle.GetComponent<RawImage>().texture);
+        // Debug.Log(particle.GetComponent<RawImage>().texture);
         particle.GetComponent<RawImage>().texture = image;
         particle.transform.position = new Vector2(Random.Range(minPosition.x, maxPosition.x), Random.Range(minPosition.y, maxPosition.y));
         script.velocity = new Vector2(Random.Range(minVelocity.x, maxVelocity.x), Random.Range(minVelocity.y, maxVelocity.y));
