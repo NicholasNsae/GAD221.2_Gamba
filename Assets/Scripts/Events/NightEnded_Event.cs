@@ -17,24 +17,30 @@ public class NightEnded_Event : EventBase
             return false;
         }
 
-        bool lostTooManyHands = nightStats.HandsLost >= 3 + Mathf.Floor(nightStats.HandsWon / 2f);
+        bool lostTooManyHands = nightStats.HandsLost >= 5 + Mathf.Floor(nightStats.HandsWon / 2f);
         bool notEnoughMoneyForMinimumBet = nightStats.BankBalance < blackjackManager.MinimumBet;
+        bool hadTooMuchToDrink = nightStats.DrinksHad >= 5;
 
-        if (lostTooManyHands || notEnoughMoneyForMinimumBet)
+        if (lostTooManyHands || notEnoughMoneyForMinimumBet || hadTooMuchToDrink)
         {
             EventInfo.EventTitleText = $"End of Night {overallStats.NightsSpentGambling}";
 
             if (lostTooManyHands)
             {
                 EventInfo.EventBodyText = new string[2];
-                EventInfo.EventBodyText[0] = "You lost one too many games tonight...";
-                EventInfo.EventBodyText[1] = "Maybe you'll have better luck next time!";
+                EventInfo.EventBodyText[0] = "You've had a bit of a losing streak...";
+                EventInfo.EventBodyText[1] = "That means you're due for a winning streak!";
             }
             else if (notEnoughMoneyForMinimumBet)
             {
                 EventInfo.EventBodyText = new string[2];
-                EventInfo.EventBodyText[0] = "Tonight wasn't your night...";
-                EventInfo.EventBodyText[1] = "That can only mean you're due for a win next time!";
+                EventInfo.EventBodyText[0] = "You've run out of money for tonight.";
+                EventInfo.EventBodyText[1] = "It's only up from here!";
+            }
+            else if (hadTooMuchToDrink)
+            {
+                EventInfo.EventBodyText = new string[1];
+                EventInfo.EventBodyText[0] = "You've passed out...";
             }
             
             return true;
