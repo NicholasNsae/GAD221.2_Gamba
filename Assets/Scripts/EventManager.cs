@@ -249,6 +249,7 @@ public class EventManager : MonoBehaviour
     {
         Debug.Log($"Night {OverallStats.NightsSpentGambling + 1} Started");
         NightStats.ResetStats();
+        NightStats.BankBalance = phoneManager.StartingBankValue;
         NightStats.TimerRunning = true;
         OverallStats.TimerRunning = true;
         
@@ -277,7 +278,7 @@ public class EventManager : MonoBehaviour
         NightStats.DrinksHad++;
         OverallStats.DrinksHad++;
         
-        CheckEventsAndAddToQueues();
+        // CheckEventsAndAddToQueues();
     }
 
     private void OnHandStarted(int betAmount)
@@ -285,7 +286,7 @@ public class EventManager : MonoBehaviour
         NightStats.BiggestBet = betAmount > NightStats.BiggestBet ? betAmount : NightStats.BiggestBet;
         OverallStats.BiggestBet = betAmount > OverallStats.BiggestBet ? betAmount : OverallStats.BiggestBet;
         
-        CheckEventsAndAddToQueues();
+        // CheckEventsAndAddToQueues();
     }
     
     private void OnHandEnded(BlackjackManager.EndState endState, int moneyWon)
@@ -327,6 +328,8 @@ public class EventManager : MonoBehaviour
             NightStats.WinningStreak = 0;
         }
         
+        UpdateBankBalance();
+        
         CheckEventsAndAddToQueues();
         StartCoroutine(TriggerEvents(afterHandEventsSimultaneous, false));
         StartCoroutine(TriggerEventsAfterCurrent(afterHandEventsQueued));
@@ -341,7 +344,12 @@ public class EventManager : MonoBehaviour
     //TODO - Should I keep track of some sort of overall bank balance?
     private void OnBankValueChanged(int oldValue, int newValue)
     {
-        NightStats.BankBalance = newValue;
-        CheckEventsAndAddToQueues();
+        UpdateBankBalance();
+        // CheckEventsAndAddToQueues();
+    }
+
+    private void UpdateBankBalance()
+    {
+        NightStats.BankBalance = phoneManager.BankValue;
     }
 }
