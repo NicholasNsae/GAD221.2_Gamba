@@ -13,7 +13,7 @@ public class NightEnded_Event : EventBase
     public override bool ConditionsMet(EventStats nightStats, EventStats overallStats)
     {
         bool playedTooManyHands = nightStats.HandsPlayed >= 15 + Mathf.Floor(nightStats.HandsWon / 2f);
-        bool notEnoughMoneyForMinimumBet = nightStats.BankBalance < blackjackManager.MinimumBet;
+        bool notEnoughMoneyForMinimumBet = (nightStats.BankBalance < blackjackManager.MinimumBet) && nightStats.HandsPlayed > 0;
         bool hadTooMuchToDrink = nightStats.DrinksHad >= 5;
 
         if (playedTooManyHands || notEnoughMoneyForMinimumBet || hadTooMuchToDrink)
