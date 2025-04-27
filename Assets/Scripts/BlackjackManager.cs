@@ -233,7 +233,7 @@ public class BlackjackManager : MonoBehaviour
             else EndGame(EndState.Loss);
         }
         else if (cardAceValue == 21) EndGame(EndState.NaturalWin);
-        Debug.Log("yippee");
+        Debug.Log("Starting hand!");
     }
 
     private void CheckValidityOfDouble()
@@ -310,7 +310,7 @@ public class BlackjackManager : MonoBehaviour
 
     private void Stand()
     {
-        Debug.Log("stand");
+        // Debug.Log("stand");
         RevealDealerCards();
         while (dealerCardAceValue < 17) DrawDealerCard(false);
         if (currentState != BlackjackState.Idle)
@@ -525,7 +525,7 @@ public class BlackjackManager : MonoBehaviour
 
     private IEnumerator HandStatusAnimation(int betValue, string winCondition)
     {
-        Debug.Log("Coroutine Started");
+        // Debug.Log("Coroutine Started");
         statusFieldText.gameObject.SetActive(true);
         RectTransform statusRect = statusFieldText.GetComponent<RectTransform>();
         float elapsedMoveTime = 0f;
